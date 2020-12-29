@@ -1,9 +1,5 @@
-
 from kivy.app import App
-from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import  GridLayout
@@ -12,188 +8,263 @@ from kivy.uix.screenmanager import Screen, WipeTransition, RiseInTransition
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
-from recyclerview import EmberViewer
+from recyclerview import ListViewer
 from kivy.uix.screenmanager import ScreenManager
+import datetime
 
-lista = [{"text":"Karcsi","kor":35},{"text":"Béla","kor":52}]
 
-class DetailsScreen(Screen):
+lista = [{"text":"ABC123","evjarat":"1955","tipus":"Ford","ar": "500000"},{"text":"P00001","evjarat":"2020","tipus":"Ford 200","ar": "123456789"},{"text":"XYZ000","evjarat":"2000","tipus":"Renault Clio 1.5","ar": "1500000"},{"text":"CICA01","evjarat":"2015","tipus":"Honda","ar": "5500000"}]
+
+class ListaScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        layout = FloatLayout(size=Window.size)
-        recyclerView = EmberViewer()
-        self.rv = recyclerView
-        self.rv.width=Window.width
-        self.rv.data = lista
+
+        layout = BoxLayout()
+        layout.orientation = "vertical"
+        layout.padding = 20
+        layout.spacing = 20
+
+        recyclerView = ListViewer()
+        self.lv = recyclerView
+        self.lv.width=Window.width
+        self.lv.data = lista
         layout.add_widget(recyclerView)
-        layout.add_widget(Label(text="Helló"))
-        button=Button (text="Back",size_hint=(0.6,0.2))
-        button.pos_hint={"center_x":0.5,'y':0.1}
+
+
+        button=Button (text="Vissza",size_hint=(1.0,0.2))
+        button.pos_hint={"center_x": 0.5, 'y': 0.0}
+        button.color=(1.0, 1.0, 1.0, 1)
+        button.background_color=(1.5, 1.5, 1.5, 1)
         button.bind(on_press=self.backToForm)
         layout.add_widget(button)
+
         self.add_widget(layout)
         self.bind(on_pre_enter=self.refreshData)
 
     def backToForm(self,instance):
-        sm.transition.direction = "right"
-        sm.current="Plus"
+        sm.current="Form"
+
     def refreshData(self,instance):
-        self.rv.data=lista
+        self.lv.data=lista
 
 
-class PlusScreen(Screen):
+class InfoScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        layout = FloatLayout(size=Window.size)
-        self.lbl=Label(text= "One Plus")
-        layout.add_widget(self.lbl)
-        #layout.add_widget(Label(text="Plus One"))
-        button=Button (text="Back",size_hint=(0.6,0.2))
-        button.pos_hint={"center_x":0.5,'y':0.1}
+
+        layout = BoxLayout()
+        layout.orientation = "vertical"
+        layout.padding = 20
+        layout.spacing = 20
+
+        label=Label()
+        self.lbl=label
+        self.lbl.width = Window.width
+        self.lbl.font_size=30
+        layout.add_widget(label)
+
+        button=Button (text="Vissza",size_hint=(1.0,0.2))
+        button.background_color = (1.5, 1.5, 1.5, 1)
+        button.pos_hint={"center_x":0.5,'y':0.0}
         button.bind(on_press=self.backToForm)
         layout.add_widget(button)
+
         self.add_widget(layout)
 
     def backToForm(self,instance):
-        sm.transition.direction = "right"
-        sm.current="Form"
+        sm.current="Lista"
 
 class FormScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
         layout = BoxLayout()
         layout.orientation = "vertical"
-        layout.opacity = 0.4
+        layout.opacity = 1.0
         layout.padding = 20
         layout.spacing = 20
         grid = GridLayout()
         grid.spacing = 10
         grid.cols = 2
-        nev = Label(text="Név")
-        nev.bind(pos=self.redraw, size=self.redraw)
-        with nev.canvas.before:
-            Color(0.4, 0.4, 0.4, 1)
-            self.bg_rec = Rectangle(size=nev.size, pos=nev.pos)
-        grid.add_widget(nev)
-        nevmezo = TextInput(multiline=False)  # password=True,
-        nevmezo.foreground_color = (0.0, 0.0, 0.0, 1)
-        nevmezo.background_normal = "index.jpg"
-        nevmezo.background_active = "index.jpg"
-        nevmezo.font_size = 20
-        nevmezo.font_name = "Roboto-Bold"
-        layout.nevmezo=nevmezo
-        grid.add_widget(nevmezo)
-        kor = Label(text="Kor")
-        kor.bind(pos=self.redrawKor, size=self.redrawKor)
-        with kor.canvas.before:
-            Color(0.4, 0.4, 0.4, 1)
-            self.bg_rec_Kor = Rectangle(size=kor.size, pos=kor.pos)
-        grid.add_widget(kor)
+
+#RENDSZAM
+        rendszamgomb = Button(text="Rendszám:", size_hint=(1.0, 0.1))
+        rendszamgomb.pos_hint = {"center_x": 0.5, 'y': 0.0}
+        rendszamgomb.color = (1.0, 1.0, 1.0, 1)
+        rendszamgomb.bind(on_press=self.clearRendszammezo)
+        grid.add_widget(rendszamgomb)
+
+        rendszammezo = TextInput(multiline=False, write_tab=False)
+        rendszammezo.foreground_color = (0.0, 0.0, 0.0, 5)
+        rendszammezo.background_color =(1.0, 1.0, 1.0, 5)
+        rendszammezo.font_size = 30
+        rendszammezo.font_name = "Roboto-Bold"
+        layout.rendszammezo=rendszammezo
+        grid.add_widget(rendszammezo)
+
+#ÉVJÁRAT
+        evjaratgomb = Button(text="Évjárat:", size_hint=(1.0, 0.1))
+        evjaratgomb.pos_hint = {"center_x": 0.5, 'y': 0.0}
+        evjaratgomb.color = (1.0, 1.0, 1.0, 1)
+        evjaratgomb.bind(on_press=self.clearEvjaratmezo)
+        grid.add_widget(evjaratgomb)
+
+        evjaratmezo = TextInput(multiline=False,write_tab=False)
+        evjaratmezo.foreground_color = (0.0, 0.0, 0.0, 5)
+        evjaratmezo.background_color = (1.0, 1.0, 1.0, 5)
+        evjaratmezo.font_size = 30
+        evjaratmezo.font_name = "Roboto-Bold"
+        layout.evjaratmezo = evjaratmezo
+        grid.add_widget(evjaratmezo)
+
+#Tipus
+        tipusgomb = Button(text="Típus:", size_hint=(1.0, 0.1))
+        tipusgomb.pos_hint = {"center_x": 0.5, 'y': 0.0}
+        tipusgomb.bind(on_press=self.clearTipusmezo)
+        grid.add_widget(tipusgomb)
+
+        tipusmezo = TextInput(multiline=False,write_tab=False)
+        tipusmezo.foreground_color = (0.0, 0.0, 0.0, 5)
+        tipusmezo.background_color = (1.0, 1.0, 1.0, 5)
+        tipusmezo.font_size = 30
+        tipusmezo.font_name = "Roboto-Bold"
+        layout.tipusmezo = tipusmezo
+        grid.add_widget(tipusmezo)
+
+#ÁR
+        argomb = Button(text="Ár:", size_hint=(1.0, 0.1))
+        argomb.pos_hint = {"center_x": 0.5, 'y': 0.0}
+        argomb.bind(on_press=self.clearArmezo)
+        grid.add_widget(argomb)
+
+        armezo = TextInput(multiline=False,write_tab=False)
+        armezo.foreground_color = (0.0, 0.0, 0.0, 5)
+        armezo.background_color = (1.0, 1.0, 1.0, 5)
+        armezo.font_size = 30
+        armezo.font_name = "Roboto-Bold"
+        layout.armezo = armezo
+        grid.add_widget(armezo)
+
         layout.add_widget(grid)
-        kormezo = TextInput(multiline=False)  # password=True,
-        kormezo.foreground_color = (0.0, 0.0, 0.0, 1)
-        kormezo.background_normal = "index.jpg"
-        kormezo.background_active = "index.jpg"
-        kormezo.font_size = 20
-        kormezo.font_name = "Roboto-Bold"
-        layout.kormezo=kormezo
-        grid.add_widget(kormezo)
-        button = Button(text="Ellenőrzés")
-        button.bind(on_press=self.checkFieldsAndPrintData)
-        button.bind(on_touch_down =self.clearInputs)
-        button.background_normal = "index.jpg"
-        button.background_down = "cica.jpg"
-        layout.add_widget(button)
 
-        nextbutton = Button(text="Következő")
-        nextbutton.bind(on_press=self.showDetails)
-        layout.add_widget(nextbutton)
+#Gomb
+        button1 = Button(text="Hozzáadás",size_hint=(1.0,0.3))
+        button1.background_color=(1.5, 1.5, 1.5, 1)
+        button1.bind(on_press=self.checkFieldsAndPrintData)
+        layout.add_widget(button1)
 
+        button2 = Button(text="Lista",size_hint=(1.0,0.3))
+        button2.background_color = (1.5, 1.5, 1.5, 1)
+        button2.bind(on_press=self.showDetails)
+        layout.add_widget(button2)
 
-        float = FloatLayout(size=(300, 300))
-        layout.add_widget(float)
-        btn = Button(text="én is", size_hint=(0.5, 0.2))  # x tengely, ytengely
-        btn.bind(on_touch_down=self.removeIfDoubleTap)
-        btn.pos_hint = {'center_x': 0.5, 'y': 0.5}
-        btn2 = Button(text="én is2", size_hint=(0.5, 0.2))  # x tengely, ytengely
-        btn2.bind(on_touch_down=self.removeIfDoubleTap)
-        btn2.pos_hint = {'center_x': 0.2, 'y': 0.5}
-        float.add_widget(btn)
-        float.add_widget(btn2)
         self.layout=layout
         self.add_widget(layout)
         self.bind(on_leave=self.clearOnLeave)
 
     def showDetails(self,instance):
-        #pass
+
         sm.transition.direction="left"
-        sm.current="Details"
-        #sm.current=sm.next()
+        sm.current="Lista"
 
     def clearOnLeave(self,instance):
-        self.layout.kormezo.text = ""
-        self.layout.nevmezo.text = ""
+        self.layout.evjaratmezo.text = ""
+        self.layout.rendszammezo.text = ""
+        self.layout.tipusmezo.text = ""
+        self.layout.armezo.text = ""
 
-    def clearInputs(self,instance,touch):
-        if touch.is_double_tap:
-            self.layout.kormezo.text=""
-            self.layout.nevmezo.text=""
-            #popup
-            layout = BoxLayout()
-            layout.add_widget(Label(text="Kitörölve"))
-            closeButton = Button(text="Bezárni")
-            layout.add_widget(closeButton)
-            popup = Popup(title="Demo",content=layout)
-            popup.open()
-            closeButton.bind(on_press = popup.dismiss)
-        #else:
-          #  self.checkFieldsAndPrintData(instance)
+    def clearRendszammezo(self, instance):
+        self.layout.rendszammezo.text = ""
+    def clearEvjaratmezo(self, instance):
+        self.layout.evjaratmezo.text = ""
+    def clearTipusmezo(self, instance):
+        self.layout.tipusmezo.text = ""
+    def clearArmezo(self, instance):
+        self.layout.armezo.text = ""
 
-    def removeIfDoubleTap(self, instance, touch):
-        if touch.is_double_tap:
-            parent =instance.parent
-            parent.remove_widget(instance)
-
-
-    def redraw(self, instance, value):
-            self.bg_rec.size = instance.size
-            self.bg_rec.pos = instance.pos
-    def redrawKor(self, instance, value):
-            self.bg_rec_Kor.size = instance.size
-            self.bg_rec_Kor.pos = instance.pos
     def checkFieldsAndPrintData(self, instance):
-        nevmezo=self.layout.nevmezo
-        kormezo=self.layout.kormezo
-        if len(nevmezo.text) <=0 or len(kormezo.text) <=0:
-            if not hasattr(self,"errorMessage"):
-             self.layout.errorMessage=Label(text="nem lehet üres")
-             self.add_widget(self.layout.errorMessage,len(self.layout.children)-4)
-        elif not kormezo.text.isdigit():
-            if not hasattr(self, "errorMessage"):
-                self.layout.errorMessage = Label(text="a kor egy szám legyen")
-                self.add_widget(self.layout.errorMessage, len(self.layout.children) - 4)
-            else:
-                self.layout.errorMessage.text="a kor egy szám legyen"
+        date = datetime.datetime.now()
+        x =(date.year)
+        rendszammezo=self.layout.rendszammezo
+        evjaratmezo=self.layout.evjaratmezo
+        tipusmezo=self.layout.tipusmezo
+        armezo=self.layout.armezo
+
+        if len(rendszammezo.text) <=0 or len(evjaratmezo.text) <=0 or len(tipusmezo.text) <=0 or len(armezo.text)<=0:
+            layout = BoxLayout()
+            layout.orientation = "vertical"
+            layout.add_widget(Label(text="Töltsön ki minden mezőt!", font_size=20))
+            closeButton = Button(text="Vissza", size_hint=(1.0, 0.2))
+            closeButton.background_color = (1.5, 1.5, 1.5, 1)
+            layout.add_widget(closeButton)
+            popup = Popup(title="Hiba", content=layout)
+            popup.open()
+            closeButton.bind(on_press=popup.dismiss)
+
+        elif not len(rendszammezo.text) ==6:
+            layout = BoxLayout()
+            layout.orientation = "vertical"
+            layout.add_widget(Label(text="A rendszám nem megfelelő", font_size=20))
+            closeButton = Button(text="Vissza", size_hint=(1.0, 0.2))
+            closeButton.background_color = (1.5, 1.5, 1.5, 1)
+            layout.add_widget(closeButton)
+            popup = Popup(title="Hiba", content=layout)
+            popup.open()
+            closeButton.bind(on_press=popup.dismiss)
+
+        elif not evjaratmezo.text.isdigit() or not len(evjaratmezo.text)==4 or int(evjaratmezo.text) > x or int(evjaratmezo.text)<1000:
+            layout = BoxLayout()
+            layout.orientation = "vertical"
+            layout.add_widget(Label(text="Az évjárat nem megfelelő", font_size=20))
+            closeButton = Button(text="Vissza", size_hint=(1.0, 0.2))
+            closeButton.background_color = (1.5, 1.5, 1.5, 1)
+            layout.add_widget(closeButton)
+            popup = Popup(title="Hiba", content=layout)
+            popup.open()
+            closeButton.bind(on_press=popup.dismiss)
+
+        elif not armezo.text.isdigit():
+            layout = BoxLayout()
+            layout.orientation = "vertical"
+            layout.add_widget(Label(text="Az ár nem megfelelő", font_size=20))
+            closeButton = Button(text="Vissza", size_hint=(1.0, 0.2))
+            closeButton.background_color = (1.5, 1.5, 1.5, 1)
+            layout.add_widget(closeButton)
+            popup = Popup(title="Hiba", content=layout)
+            popup.open()
+            closeButton.bind(on_press=popup.dismiss)
+
         else:
-            if hasattr(self, "errorMessage"):
-                self.remove_widget(self.layout.errorMessage)
-            lista.append({"text":nevmezo.text, "kor":kormezo.text})
-            print("A "+nevmezo.text+" nevű kolléga "+kormezo.text+" éves")
-            print (len(lista))
+            layout = BoxLayout()
+            layout.orientation = "vertical"
+            layout.add_widget(Label(text="Rendszám: "+rendszammezo.text+"\n\nÉvjárat: "+evjaratmezo.text+"\n\nTípus: "+tipusmezo.text+"\n\nÁr: "+armezo.text, font_size=20))
+            closeButton = Button(text="Rendben", size_hint=(1.0, 0.2))
+            closeButton.background_color = (1.5, 1.5, 1.5, 1)
+            layout.add_widget(closeButton)
+            popup = Popup(title="Sikeres Mentés", content=layout)
+            popup.open()
+            closeButton.bind(on_press=popup.dismiss)
+            lista.append({"text": rendszammezo.text, "evjarat" : evjaratmezo.text, "tipus" : tipusmezo.text, "ar" : armezo.text})
+
+            self.layout.rendszammezo.text = ""
+            self.layout.evjaratmezo.text = ""
+            self.layout.tipusmezo.text = ""
+            self.layout.armezo.text = ""
 
 sm=ScreenManager()
 
 class Hello(App):
     def build(self):
+        self.title = 'Gépjármű-nyilvántartás'
         formScreen = FormScreen(name="Form")
         sm.add_widget(formScreen)
-        detailsScreen = DetailsScreen(name="Details")
-        sm.add_widget(detailsScreen)
-        plusScreen = PlusScreen(name="Plus")
-        sm.add_widget(plusScreen)
-        #sm.transition=WipeTransition()
-        sm.transition=RiseInTransition() #ilyenkor a tööbi beállitás nem működök
 
+        listaScreen = ListaScreen(name="Lista")
+        sm.add_widget(listaScreen)
+
+        infoScreen = InfoScreen(name="Info")
+        sm.add_widget(infoScreen)
+
+        sm.transition=RiseInTransition()
         sm.current ="Form"
         return sm
 
